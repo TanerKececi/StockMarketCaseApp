@@ -1,7 +1,12 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
+    id("androidx.navigation.safeargs.kotlin")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -11,7 +16,10 @@ android {
     viewBinding{
         enable = true
     }
-    buildFeatures { dataBinding = true }
+    buildFeatures {
+        dataBinding = true
+        buildConfig = true
+    }
 
     defaultConfig {
         applicationId = "com.example.stockmarketcaseapp"
@@ -21,6 +29,15 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Get the API key from local.properties
+        val localProperties = Properties().apply {
+            val localPropertiesFile = rootProject.file("local.properties")
+            if (localPropertiesFile.exists()) {
+                localPropertiesFile.inputStream().use { load(it) }
+            }
+        }
+        buildConfigField("String", "apiKey", "\"${localProperties["apiKey"]}\"")
     }
 
     buildTypes {

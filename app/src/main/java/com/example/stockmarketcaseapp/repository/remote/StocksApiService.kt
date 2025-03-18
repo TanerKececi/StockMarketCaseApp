@@ -14,5 +14,5 @@ interface StocksApiService {
     suspend fun getService2Data(
         @Query("fields") fields: String,
         @Query("stcs") stocks: String
-    ): Response<Map<String, StockData>>
+    ): Response<List<StockData>>
 }

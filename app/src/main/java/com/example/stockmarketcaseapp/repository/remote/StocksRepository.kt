@@ -7,5 +7,5 @@ import retrofit2.Response
 interface StocksRepository {
     suspend fun getService1Data(): Response<Service1Response>
 
-    suspend fun getService2Data(fields: String, stocks: String): Response<Map<String, StockData>>
+    suspend fun getService2Data(fields: String, stocks: String): Response<List<StockData>>
 }

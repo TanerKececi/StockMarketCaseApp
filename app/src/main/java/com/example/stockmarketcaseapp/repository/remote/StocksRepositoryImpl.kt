@@ -13,7 +13,7 @@ class StocksRepositoryImpl @Inject constructor(
         return stockApi.getService1Data()
     }
 
-    override suspend fun getService2Data(fields: String, stocks: String): Response<Map<String, StockData>> {
+    override suspend fun getService2Data(fields: String, stocks: String): Response<List<StockData>> {
         return stockApi.getService2Data(fields, stocks)
     }
 }

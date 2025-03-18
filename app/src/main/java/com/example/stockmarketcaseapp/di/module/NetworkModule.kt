@@ -2,10 +2,10 @@ package com.example.stockmarketcaseapp.di.module
 
 import android.app.Application
 import android.content.Context
+import com.example.stockmarketcaseapp.BuildConfig
 import com.example.stockmarketcaseapp.repository.remote.StocksApiService
 import com.example.stockmarketcaseapp.repository.remote.StocksRepository
 import com.example.stockmarketcaseapp.repository.remote.StocksRepositoryImpl
-import com.example.stockmarketcaseapp.util.LocalProperties
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -38,7 +38,7 @@ class NetworkModule {
     @Provides
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
-        val baseUrl = LocalProperties.getProperty("BASE_URL") ?: throw IllegalStateException("BASE_URL not found in local.properties")
+        val baseUrl = BuildConfig.apiKey ?: throw IllegalStateException("BASE_URL not found in local.properties")
         return Retrofit.Builder()
             .baseUrl(baseUrl)
             .client(okHttpClient)
