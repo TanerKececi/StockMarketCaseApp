@@ -31,16 +31,32 @@ class MainViewModel @Inject constructor(
     private val _secondFilter = MutableLiveData<ColumnItem>()
     val secondFilter: LiveData<ColumnItem> get() = _secondFilter
 
+    private val selectedFilters: List<Filter>
+        get() = listOf(_firstFilter.value?.toFilter() ?: Filter.SON, _secondFilter.value?.toFilter() ?: Filter.PERCENT_CHANGE)
+
     private var allStockItemsWithDefinitions: List<StockItem> = listOf()
-    private var allFilterList: List<ColumnItem> = listOf()
+
+    var allFilterList: List<ColumnItem> = listOf()
+        private set
+
     private var allApiStocksCache: List<StockData> = listOf()
 
-    fun setFirstFilter() {
-
+    fun setFirstFilter(newSelectedItem: ColumnItem) {
+        val oldSelectedItem = _firstFilter.value ?: return
+        val itemInList = allFilterList.find { it.key == newSelectedItem.key } ?: return
+        itemInList.isSelected = itemInList.isSelected.not()
+        oldSelectedItem.isSelected = oldSelectedItem.isSelected.not()
+        _firstFilter.value = itemInList
+        reFilterStocks()
     }
 
-    fun setSecondFilter() {
-
+    fun setSecondFilter(newSelectedItem: ColumnItem) {
+        val oldSelectedItem = _secondFilter.value ?: return
+        val itemInList = allFilterList.find { it.key == newSelectedItem.key } ?: return
+        itemInList.isSelected = itemInList.isSelected.not()
+        oldSelectedItem.isSelected = oldSelectedItem.isSelected.not()
+        _secondFilter.value = itemInList
+        reFilterStocks()
     }
 
     //This method is only for testing the api call.
@@ -54,8 +70,10 @@ class MainViewModel @Inject constructor(
                     allStockItemsWithDefinitions = service1Response.body()?.mypageDefaults ?: listOf()
                     allFilterList = service1Response.body()?.mypage ?: listOf()
                     val stockKeys = allStockItemsWithDefinitions.joinToString("~") { it.tke }
-                    val fields = allFilterList.take(2).joinToString(",") { it.key }
+                    val fields = allFilterList.joinToString(",") { it.key }
+                    allFilterList[0].isSelected = true
                     _firstFilter.postValue(allFilterList[0])
+                    allFilterList[1].isSelected = true
                     _secondFilter.postValue(allFilterList[1])
                     Log.d("MainViewModel", "Hisse Senedi Anahtarları: $stockKeys")
                     val service2Response = stockRepository.getService2Data(
@@ -64,7 +82,6 @@ class MainViewModel @Inject constructor(
                     )
 
                     if (service2Response.isSuccessful) {
-                        val selectedFilters = listOf(_firstFilter.value?.toFilter() ?: Filter.SON, _secondFilter.value?.toFilter() ?: Filter.PERCENT_CHANGE)
                         Log.d("MainViewModel", "Servis 2 Yanıtı: ${service2Response.body()}")
                         allApiStocksCache = service2Response.body() ?: listOf()
                         val uiModelList = allApiStocksCache.map { it.mapToUiModel(selectedFilters, allStockItemsWithDefinitions)}
@@ -81,8 +98,8 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun reFilterStocks(detailedStocks: List<StockData>, newFilters: List<Filter>) {
-        val uiModelList = allApiStocksCache.map { it.mapToUiModel(newFilters, allStockItemsWithDefinitions)}
+    fun reFilterStocks() {
+        val uiModelList = allApiStocksCache.map { it.mapToUiModel(selectedFilters, allStockItemsWithDefinitions)}
         _stockDataList.postValue(uiModelList)
     }
 

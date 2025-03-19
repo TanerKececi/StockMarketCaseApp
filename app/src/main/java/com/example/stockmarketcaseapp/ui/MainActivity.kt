@@ -6,10 +6,10 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.stockmarketcaseapp.R
 import com.example.stockmarketcaseapp.databinding.ActivityMainBinding
+import com.example.stockmarketcaseapp.model.ColumnItem
 import com.example.stockmarketcaseapp.ui.adapter.StockAdapter
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -36,6 +36,24 @@ class MainActivity : AppCompatActivity() {
         binding.rvStockItems.adapter = adapter
         viewModel.fetchStockDataForTesting()
         observeViewModel()
+        initOnClicks()
+    }
+
+    private fun initOnClicks() {
+        binding.containerColum1Button.setOnClickListener {
+            val secondFilter = viewModel.secondFilter
+            val filterList = viewModel.allFilterList.filter { it.key != secondFilter.value?.key }
+            showSelectionDialogFragment(filterList) { selectedItem ->
+                viewModel.setFirstFilter(selectedItem)
+            }
+        }
+        binding.containerColum2Button.setOnClickListener {
+            val firstFilter = viewModel.firstFilter
+            val filterList = viewModel.allFilterList.filter { it.key != firstFilter.value?.key }
+            showSelectionDialogFragment(filterList) { selectedItem ->
+                viewModel.setSecondFilter(selectedItem)
+            }
+        }
     }
 
     private fun observeViewModel() {
@@ -47,7 +65,15 @@ class MainActivity : AppCompatActivity() {
         }
         viewModel.secondFilter.observe(this) { secondFilter ->
             binding.tvColumn2.text = secondFilter.name
-
         }
+    }
+
+    private fun showSelectionDialogFragment(
+        items: List<ColumnItem>,
+        onItemSelected: (ColumnItem) -> Unit
+    ) {
+        val fragment = SelectionDialogFragment.newInstance(items, onItemSelected)
+
+        fragment.show(supportFragmentManager, "SelectionDialogFragment")
     }
 }

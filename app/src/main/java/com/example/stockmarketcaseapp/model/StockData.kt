@@ -31,7 +31,6 @@ data class StockData(
 }
 
 fun StockData.mapToUiModel(selectedFilters: List<Filter>, stockItemList: List<StockItem>): StockDataUiModel {
-    require(selectedFilters.size == 2) { "Exactly 2 filters must be selected." }
 
     val formattedTime = getFormattedDateTime()
 
