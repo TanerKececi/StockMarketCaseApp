@@ -1,5 +1,6 @@
 [versions]
 agp = "8.8.0"
+cardview = "1.0.0"
 glide = "4.16.0"
 hiltAndroid = "2.51.1"
 hiltCompiler = "1.0.0"
@@ -22,6 +23,7 @@ roomRuntime = "2.6.1"
 navigationSafeArgsGradlePlugin = "2.8.2"
 
 [libraries]
+androidx-cardview = { module = "androidx.cardview:cardview", version.ref = "cardview" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltCompiler" }
 androidx-hilt-navigation-fragment = { module = "androidx.hilt:hilt-navigation-fragment", version.ref = "hiltNavigationFragment" }

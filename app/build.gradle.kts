@@ -97,6 +97,8 @@ dependencies {
 
     kapt (libs.androidx.hilt.compiler)
     implementation (libs.androidx.hilt.navigation.fragment)
+    implementation (libs.androidx.cardview)
+    implementation (libs.material)
 }
 
 kapt { correctErrorTypes = true }
