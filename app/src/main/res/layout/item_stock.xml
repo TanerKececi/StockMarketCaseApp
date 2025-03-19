@@ -5,7 +5,7 @@
     <data>
         <variable
             name="stock"
-            type="com.example.stockmarketcaseapp.model.StockData" />
+            type="com.example.stockmarketcaseapp.model.StockDataUiModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -44,6 +44,7 @@
             android:textColor="@color/white"
             android:textSize="20sp"
             tools:text="XU100"
+            android:text="@{stock.code}"
             android:textStyle="bold"
             android:layout_marginStart="20dp"
             app:layout_constraintStart_toEndOf="@id/value_change_indicator_container"
@@ -55,6 +56,7 @@
             android:layout_height="wrap_content"
             android:textColor="@color/light_gray"
             android:textSize="12sp"
+            android:text="@{stock.time}"
             tools:text="13:09:59"
             android:layout_marginStart="20dp"
             app:layout_constraintStart_toEndOf="@id/value_change_indicator_container"
@@ -66,7 +68,8 @@
             android:layout_height="wrap_content"
             android:textColor="@color/white"
             android:textSize="20sp"
-            android:layout_marginEnd="30dp"
+            android:layout_marginEnd="15dp"
+            android:text="@{stock.column1Text}"
             tools:text="1.425,59"
             app:layout_constraintEnd_toStartOf="@id/column_2_value"
             app:layout_constraintTop_toTopOf="parent"

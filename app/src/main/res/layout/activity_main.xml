@@ -14,10 +14,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:textColor="@color/gray"
+        android:text="@string/symbol"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/guideline_horizontal_top"
-        tools:text="Sembol"/>
+        app:layout_constraintBottom_toBottomOf="@id/guideline_horizontal_top"/>
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/container_colum_2_button"

@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">StockMarketCaseApp</string>
+    <string name="app_name" translatable="false">StockMarketCaseApp</string>
+    <string name="symbol">Symbol</string>
 </resources>
