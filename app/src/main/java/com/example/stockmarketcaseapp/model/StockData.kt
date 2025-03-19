@@ -1,5 +1,6 @@
 package com.example.stockmarketcaseapp.model
 
+import com.example.stockmarketcaseapp.R
 import com.google.gson.annotations.SerializedName
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -42,6 +43,15 @@ fun StockData.mapToUiModel(selectedFilters: List<Filter>, stockItemList: List<St
     val column1Value = getStockDataValue(column1Filter)
     val column2Value = getStockDataValue(column2Filter)
 
+    val textColor = when {
+        selectedFilters.any { it == Filter.CHANGE || it == Filter.PERCENT_CHANGE } -> when (getValueChange(percentFark)) {
+            ValueChange.INCREASED -> R.color.green
+            ValueChange.DECREASED -> R.color.red
+            else -> R.color.white
+        }
+        else -> R.color.white
+    }
+
     return StockDataUiModel(
         id = id,
         time = formattedTime,
@@ -50,7 +60,8 @@ fun StockData.mapToUiModel(selectedFilters: List<Filter>, stockItemList: List<St
         valueChange = getValueChange(percentFark),
         column1Text = column1Value,
         column2Text = column2Value,
-        definition = definition
+        definition = definition,
+        textColor = textColor
     )
 }
 
@@ -73,8 +84,8 @@ fun StockData.getStockDataValue(filter: Filter): String {
 }
 
 fun getValueChange(percentFark: Double?): ValueChange {
+    if (percentFark == null) return ValueChange.SAME
     return when {
-        percentFark == null -> ValueChange.SAME
         percentFark > 0 -> ValueChange.INCREASED
         percentFark < 0 -> ValueChange.DECREASED
         else -> ValueChange.SAME

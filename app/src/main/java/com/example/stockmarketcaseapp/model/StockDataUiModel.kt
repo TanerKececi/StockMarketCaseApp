@@ -9,4 +9,5 @@ data class StockDataUiModel(
     val valueChange: ValueChange,
     val column1Text: String?,
     val column2Text: String?,
+    val textColor: Int?
 )

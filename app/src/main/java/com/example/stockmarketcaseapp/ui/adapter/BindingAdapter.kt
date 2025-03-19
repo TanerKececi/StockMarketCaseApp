@@ -2,6 +2,8 @@ package com.example.stockmarketcaseapp.ui.adapter
 
 import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import com.example.stockmarketcaseapp.R
 import com.example.stockmarketcaseapp.model.ValueChange
@@ -27,5 +29,12 @@ fun ImageView.setValueChangeIndicator(change: ValueChange) {
         ValueChange.DECREASED -> {
             setImageResource(R.drawable.value_down)
         }
+    }
+}
+
+@BindingAdapter("textColorResource")
+fun TextView.textColorResource(resource: Int?) {
+    if (resource != null) {
+        setTextColor(ContextCompat.getColor(context, resource))
     }
 }

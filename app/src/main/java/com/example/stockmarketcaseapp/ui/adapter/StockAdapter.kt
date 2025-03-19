@@ -26,6 +26,7 @@ class StockAdapter : ListAdapter<StockDataUiModel, StockAdapter.StockViewHolder>
     class StockViewHolder(private val binding: ItemStockBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(stock: StockDataUiModel) {
             binding.stock = stock
+            binding.textColorResource = stock.textColor
             binding.executePendingBindings()
             val animator = ValueAnimator.ofArgb(Color.GRAY, Color.TRANSPARENT).apply {
                 duration = 1000
