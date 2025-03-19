@@ -4,7 +4,6 @@ import com.google.gson.annotations.SerializedName
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.random.Random
 
 data class StockData(
     @SerializedName("_id") val id: String,
@@ -31,10 +30,12 @@ data class StockData(
     }
 }
 
-fun StockData.mapToUiModel(selectedFilters: List<Filter>): StockDataUiModel {
+fun StockData.mapToUiModel(selectedFilters: List<Filter>, stockItemList: List<StockItem>): StockDataUiModel {
     require(selectedFilters.size == 2) { "Exactly 2 filters must be selected." }
 
     val formattedTime = getFormattedDateTime()
+
+    val definition = stockItemList.firstOrNull { it.tke == this.code }?.def ?: ""
 
     val column1Filter = selectedFilters[0]
     val column2Filter = selectedFilters[1]
@@ -48,8 +49,9 @@ fun StockData.mapToUiModel(selectedFilters: List<Filter>): StockDataUiModel {
         code = code,
         lastDouble = son,
         valueChange = getValueChange(percentFark),
-        column1Text = "${column1Filter.filterName}: $column1Value",
-        column2Text = "${column2Filter.filterName}: $column2Value"
+        column1Text = column1Value,
+        column2Text = column2Value,
+        definition = definition
     )
 }
 

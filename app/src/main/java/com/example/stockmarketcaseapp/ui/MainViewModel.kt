@@ -31,8 +31,17 @@ class MainViewModel @Inject constructor(
     private val _secondFilter = MutableLiveData<ColumnItem>()
     val secondFilter: LiveData<ColumnItem> get() = _secondFilter
 
-    private var stockItemList: List<StockItem> = listOf()
-    private var filterList: List<ColumnItem> = listOf()
+    private var allStockItemsWithDefinitions: List<StockItem> = listOf()
+    private var allFilterList: List<ColumnItem> = listOf()
+    private var allApiStocksCache: List<StockData> = listOf()
+
+    fun setFirstFilter() {
+
+    }
+
+    fun setSecondFilter() {
+
+    }
 
     //This method is only for testing the api call.
     fun fetchStockDataForTesting() {
@@ -42,12 +51,12 @@ class MainViewModel @Inject constructor(
                 if (service1Response.isSuccessful) {
                     Log.d("MainViewModel", "Servis 1 Yanıtı: ${service1Response.body()}")
 
-                    stockItemList = service1Response.body()?.mypageDefaults ?: listOf()
-                    filterList = service1Response.body()?.mypage ?: listOf()
-                    val stockKeys = stockItemList.joinToString("~") { it.tke }
-                    val fields = filterList.take(2).joinToString(",") { it.key }
-                    _firstFilter.postValue(filterList[0])
-                    _secondFilter.postValue(filterList[1])
+                    allStockItemsWithDefinitions = service1Response.body()?.mypageDefaults ?: listOf()
+                    allFilterList = service1Response.body()?.mypage ?: listOf()
+                    val stockKeys = allStockItemsWithDefinitions.joinToString("~") { it.tke }
+                    val fields = allFilterList.take(2).joinToString(",") { it.key }
+                    _firstFilter.postValue(allFilterList[0])
+                    _secondFilter.postValue(allFilterList[1])
                     Log.d("MainViewModel", "Hisse Senedi Anahtarları: $stockKeys")
                     val service2Response = stockRepository.getService2Data(
                         fields = fields,
@@ -57,8 +66,9 @@ class MainViewModel @Inject constructor(
                     if (service2Response.isSuccessful) {
                         val selectedFilters = listOf(_firstFilter.value?.toFilter() ?: Filter.SON, _secondFilter.value?.toFilter() ?: Filter.PERCENT_CHANGE)
                         Log.d("MainViewModel", "Servis 2 Yanıtı: ${service2Response.body()}")
-                        val uiModelList = service2Response.body()?.map { it.mapToUiModel(selectedFilters)} ?: listOf()
-                        _stockDataList.postValue(uiModelList)  // Verileri LiveData'ya aktar
+                        allApiStocksCache = service2Response.body() ?: listOf()
+                        val uiModelList = allApiStocksCache.map { it.mapToUiModel(selectedFilters, allStockItemsWithDefinitions)}
+                        _stockDataList.postValue(uiModelList)
                     } else {
                         Log.e("MainViewModel", "Servis 2 Hatası: ${service2Response.message()}")
                     }
@@ -69,6 +79,11 @@ class MainViewModel @Inject constructor(
                 Log.e("MainViewModel", "Hata: ${e.message}")
             }
         }
+    }
+
+    fun reFilterStocks(detailedStocks: List<StockData>, newFilters: List<Filter>) {
+        val uiModelList = allApiStocksCache.map { it.mapToUiModel(newFilters, allStockItemsWithDefinitions)}
+        _stockDataList.postValue(uiModelList)
     }
 
 }
