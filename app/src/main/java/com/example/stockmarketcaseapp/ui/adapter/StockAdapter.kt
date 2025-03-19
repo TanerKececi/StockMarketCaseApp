@@ -1,5 +1,7 @@
 package com.example.stockmarketcaseapp.ui.adapter
 
+import android.animation.ValueAnimator
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -25,6 +27,14 @@ class StockAdapter : ListAdapter<StockDataUiModel, StockAdapter.StockViewHolder>
         fun bind(stock: StockDataUiModel) {
             binding.stock = stock
             binding.executePendingBindings()
+            // Güncellenen item'ı beyazlatıp geri döndür
+            val animator = ValueAnimator.ofArgb(Color.GRAY, Color.TRANSPARENT).apply {
+                duration = 1000 // Animasyon süresi (ms)
+                addUpdateListener { animator ->
+                    binding.root.setBackgroundColor(animator.animatedValue as Int)
+                }
+            }
+            animator.start()
         }
     }
 
