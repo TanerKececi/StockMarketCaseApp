@@ -14,6 +14,9 @@ import com.example.stockmarketcaseapp.model.mapToUiModel
 import com.example.stockmarketcaseapp.model.toFilter
 import com.example.stockmarketcaseapp.repository.remote.StocksRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -40,6 +43,28 @@ class MainViewModel @Inject constructor(
         private set
 
     private var allApiStocksCache: List<StockData> = listOf()
+
+    private var timerJob: Job? = null
+
+    fun startTimer() {
+        timerJob?.cancel()
+        timerJob = viewModelScope.launch {
+            while (isActive) {
+                makeFetchWithFilters()
+                delay(3000)
+            }
+        }
+    }
+
+    private fun stopTimer() {
+        timerJob?.cancel()
+        timerJob = null
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        stopTimer()
+    }
 
     fun setFirstFilter(newSelectedItem: ColumnItem) {
         val oldSelectedItem = _firstFilter.value ?: return
@@ -70,30 +95,35 @@ class MainViewModel @Inject constructor(
                     allStockItemsWithDefinitions = service1Response.body()?.mypageDefaults ?: listOf()
                     allFilterList = service1Response.body()?.mypage ?: listOf()
                     val stockKeys = allStockItemsWithDefinitions.joinToString("~") { it.tke }
-                    val fields = allFilterList.joinToString(",") { it.key }
                     allFilterList[0].isSelected = true
                     _firstFilter.postValue(allFilterList[0])
                     allFilterList[1].isSelected = true
                     _secondFilter.postValue(allFilterList[1])
                     Log.d("MainViewModel", "Hisse Senedi Anahtarları: $stockKeys")
-                    val service2Response = stockRepository.getService2Data(
-                        fields = fields,
-                        stocks = stockKeys
-                    )
-
-                    if (service2Response.isSuccessful) {
-                        Log.d("MainViewModel", "Servis 2 Yanıtı: ${service2Response.body()}")
-                        allApiStocksCache = service2Response.body() ?: listOf()
-                        val uiModelList = allApiStocksCache.map { it.mapToUiModel(selectedFilters, allStockItemsWithDefinitions)}
-                        _stockDataList.postValue(uiModelList)
-                    } else {
-                        Log.e("MainViewModel", "Servis 2 Hatası: ${service2Response.message()}")
-                    }
+                    startTimer()
                 } else {
                     Log.e("MainViewModel", "Servis 1 Hatası: ${service1Response.message()}")
                 }
             } catch (e: Exception) {
                 Log.e("MainViewModel", "Hata: ${e.message}")
+            }
+        }
+    }
+
+    fun makeFetchWithFilters() {
+        viewModelScope.launch {
+            val fields = allFilterList.joinToString(",") { it.key }
+            val stockKeys = allStockItemsWithDefinitions.joinToString("~") { it.tke }
+            val service2Response = stockRepository.getService2Data(
+                fields = fields,
+                stocks = stockKeys)
+            if (service2Response.isSuccessful) {
+                Log.d("MainViewModel", "Servis 2 Yanıtı: ${service2Response.body()}")
+                allApiStocksCache = service2Response.body() ?: listOf()
+                val uiModelList = allApiStocksCache.map { it.mapToUiModel(selectedFilters, allStockItemsWithDefinitions)}
+                _stockDataList.postValue(uiModelList)
+            } else {
+                Log.e("MainViewModel", "Servis 2 Hatası: ${service2Response.message()}")
             }
         }
     }
